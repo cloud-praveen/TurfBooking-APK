@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export const LoginScreen = () => {
     return (
@@ -25,7 +25,7 @@ export const LoginScreen = () => {
 
                     <View className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <View className="w-12 h-12 bg-[#E0E2D8] rounded-full items-center justify-center mb-2">
-                            <FontAwesome5 name="cricket" size={24} color="#2E7D32" />
+                        <MaterialCommunityIcons name="cricket" size={25} color="#159947" />
                         </View>
                         <Text className="text-white text-2xl font-bold">Game On !</Text>
                         <Text className="text-gray-300 text-xs">Join the league of champions today</Text>
@@ -35,23 +35,23 @@ export const LoginScreen = () => {
 
             {/* Form Section */}
             <View className="w-full px-8">
-                <Text className="text-[#2E7D32] text-xl font-bold mb-1">Enter Your</Text>
-                <Text className="text-[#2E7D32] text-xl font-bold mb-6">Phone Number</Text>
+                <Text className="text-[#1DB954] text-xl font-bold mb-1">Enter Your</Text>
+                <Text className="text-[#1DB954] text-xl font-bold mb-6 ">Phone Number</Text>
 
                 {/* Phone Input */}
-                <View className="flex-row items-center bg-[#252A3A] rounded-xl h-14 px-4 border border-gray-700 mb-6">
-                    <Text className="text-white text-base mr-3">+91</Text>
-                    <View className="w-[1px] h-6 bg-gray-500 mr-3" />
+                <View className="flex-row items-center bg-[#252A3A] rounded-full h-14 px-4 border border-gray-700 mb-6">
+                    <Text className="text-white  mr-3">+91</Text>
+                    <View className="w-[1px] h-6 bg-gray-500 mr-3 " />
                     <TextInput
                         placeholder="Phone Number"
                         placeholderTextColor="#6B7280"
-                        className="flex-1 text-white text-base"
+                        className=" text-white text-center "
                         keyboardType="phone-pad"
                     />
                 </View>
 
                 {/* Get OTP Button */}
-                <TouchableOpacity className="w-full bg-[#2E7D32] h-14 rounded-full items-center justify-center shadow-lg shadow-green-900/50 mb-8">
+                <TouchableOpacity className="w-full bg-[#1DB954] h-14 rounded-full items-center justify-center shadow-lg shadow-green-900/50 mb-8">
                     <Text className="text-white text-base font-bold">Get OTP</Text>
                 </TouchableOpacity>
 
@@ -63,7 +63,7 @@ export const LoginScreen = () => {
                 </View>
 
                 {/* Social Login */}
-                <View className="flex-row justify-center space-x-6 pb-8">
+                <View className="flex-row justify-center gap-5 space-x-6 pb-8">
                     <TouchableOpacity className="w-12 h-12 bg-white rounded-full items-center justify-center">
                         <Image
                             source={{ uri: 'https://img.icons8.com/color/48/000000/google-logo.png' }}
