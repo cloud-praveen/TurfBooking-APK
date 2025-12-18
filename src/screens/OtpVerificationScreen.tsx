@@ -33,11 +33,11 @@ export const OtpVerificationScreen = () => {
 
             {/* Form Section */}
             <View className="w-full px-8">
-                <Text className="text-[#2E7D32] text-xl font-bold mb-1">Verify Your Number</Text>
-                <Text className="text-gray-300 text-sm mb-6">Enter the code we've sent by text to <Text className="font-bold text-white">+91 8428666442</Text></Text>
+                <Text className="text-[#1DB954] text-xl font-bold mb-1">Verify Your Number</Text>
+                <Text className="text-white text-sm mb-6">Enter the code we've sent by text to <Text className="font-bold text-white">+91 8428666442</Text></Text>
 
                 {/* OTP Input - Simplified as one field for now as per design mockup visual */}
-                <View className="flex-row items-center bg-[#252A3A] rounded-xl h-14 px-4 border border-gray-700 mb-2 justify-center">
+                <View className="flex-row items-center bg-[#252A3A] rounded-full h-14 px-4 border border-gray-700 mb-2 justify-center">
                     <TextInput
                         placeholder="|"
                         placeholderTextColor="#6B7280"
@@ -52,12 +52,12 @@ export const OtpVerificationScreen = () => {
                 <View className="flex-row mb-8">
                     <Text className="text-gray-400 text-xs">Didn't get it ? </Text>
                     <TouchableOpacity>
-                        <Text className="text-[#2E7D32] text-xs font-bold">Tap to resend.</Text>
+                        <Text className="text-[#1DB954] text-xs font-bold">Tap to resend.</Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Submit Button */}
-                <TouchableOpacity className="w-full bg-[#2E7D32] h-14 rounded-full flex-row items-center justify-center shadow-lg shadow-green-900/50 mb-8">
+                <TouchableOpacity className="w-full bg-[#1DB954] h-14 rounded-full flex-row items-center justify-center shadow-lg shadow-green-900/50 mb-8">
                     <Text className="text-white text-base font-bold mr-2">Get in the Game</Text>
                     <Ionicons name="arrow-forward" size={20} color="white" />
                 </TouchableOpacity>
