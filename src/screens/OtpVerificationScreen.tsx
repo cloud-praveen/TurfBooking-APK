@@ -17,7 +17,7 @@ export const OtpVerificationScreen = () => {
     };
 
     return (
-        <ScrollView className="flex-1 bg-[#090C15]" contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView className="flex-1 bg-background" contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header/Title Area */}
             <View className="pt-16 pb-6 items-center">
                 <View className="w-32 h-6 bg-gray-700 rounded-full mb-6 opacity-30" />
@@ -46,11 +46,11 @@ export const OtpVerificationScreen = () => {
 
             {/* Form Section */}
             <View className="w-full px-8">
-                <Text className="text-[#1DB954] text-xl font-bold mb-1">Verify Your Number</Text>
+                <Text className="text-primary text-xl font-bold mb-1">Verify Your Number</Text>
                 <Text className="text-white text-sm mb-6">Enter the code we've sent by text to <Text className="font-bold text-white">{phoneNumber || '+91 8428666442'}</Text></Text>
 
                 {/* OTP Input - Simplified as one field for now as per design mockup visual */}
-                <View className="flex-row items-center bg-[#252A3A] rounded-full h-14 px-4 border border-gray-700 mb-2 justify-center">
+                <View className="flex-row items-center bg-surface-light rounded-full h-14 px-4 border border-gray-700 mb-2 justify-center">
                     <TextInput
                         placeholder="|"
                         placeholderTextColor="#6B7280"

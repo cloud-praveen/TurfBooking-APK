@@ -16,7 +16,7 @@ export const LoginScreen = () => {
     };
 
     return (
-        <ScrollView className="flex-1 bg-[#090C15]" contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView className="flex-1 bg-background" contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header/Title Area */}
             <View className="pt-16 pb-6 items-center">
                 {/* Notch placeholder if needed, usually handled by SafeAreaView but visual was requested */}
@@ -47,8 +47,8 @@ export const LoginScreen = () => {
 
             {/* Form Section */}
             <View className="w-full px-8">
-                <Text className="text-[#1DB954] text-xl font-bold mb-1">Enter Your</Text>
-                <Text className="text-[#1DB954] text-xl font-bold mb-6 ">Phone Number</Text>
+                <Text className="text-primary text-xl font-bold mb-1">Enter Your</Text>
+                <Text className="text-primary text-xl font-bold mb-6 ">Phone Number</Text>
 
                 {/* Phone Input */}
                 <View className="flex-row items-center bg-[#252A3A] rounded-full h-14 px-4 border border-gray-700 mb-6">

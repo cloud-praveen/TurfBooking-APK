@@ -16,7 +16,7 @@ const { width } = Dimensions.get('window');
 export const BookingSummary = () => {
     const navigation = useNavigation();
     return (
-        <View className="flex-1 bg-gray-950">
+        <View className="flex-1 bg-background">
             <SafeAreaView className="flex-1">
                 {/* --- Header --- */}
                 <View className="flex-row items-center px-5 py-4">

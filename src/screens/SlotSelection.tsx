@@ -54,7 +54,7 @@ export const SlotSelection = () => {
     };
 
     return (
-        <View className="flex-1 bg-gray-950">
+        <View className="flex-1 bg-background">
             <SafeAreaView className="flex-1">
                 {/* --- Header --- */}
                 <View className="px-5 pt-2 pb-6">
@@ -93,7 +93,7 @@ export const SlotSelection = () => {
                                 <TouchableOpacity
                                     key={date.id}
                                     onPress={() => setSelectedDate(date.fullDate)}
-                                    className={`w-16 h-20 rounded-3xl mx-2 items-center justify-center border ${isSelected ? 'bg-green-500 border-green-500' : 'bg-transparent border-gray-700'}`}
+                                    className={`w-16 h-20 rounded-3xl mx-2 items-center justify-center border ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-gray-700'}`}
                                 >
                                     <Text className={`text-xs mb-1 ${isSelected ? 'text-black font-semibold' : 'text-gray-300'}`}>{date.day}</Text>
                                     <Text className={`text-lg font-bold ${isSelected ? 'text-black' : 'text-gray-300'}`}>{date.date}</Text>
@@ -110,7 +110,7 @@ export const SlotSelection = () => {
                                 <TouchableOpacity
                                     key={filter}
                                     onPress={() => setSelectedFilter(filter)}
-                                    className={`px-4 py-2 rounded-full border ${isActive ? 'bg-green-500 border-green-500' : 'bg-transparent border-gray-600'}`}
+                                    className={`px-4 py-2 rounded-full border ${isActive ? 'bg-primary border-primary' : 'bg-transparent border-gray-600'}`}
                                 >
                                     <Text className={`text-[10px] font-medium ${isActive ? 'text-black' : 'text-gray-300'}`}>
                                         {filter}
@@ -137,9 +137,9 @@ export const SlotSelection = () => {
                             const isBooked = slot.status === 'booked';
 
                             // Determine styles based on status
-                            let containerBorder = 'border-green-500/30';
+                            let containerBorder = 'border-primary/30';
                             let statusBadgeBg = 'bg-gray-800';
-                            let statusText = 'text-green-500';
+                            let statusText = 'text-primary';
                             let statusLabel = 'Available';
 
                             if (isBooked) {
@@ -153,14 +153,14 @@ export const SlotSelection = () => {
                                 statusText = 'text-yellow-500';
                                 statusLabel = 'FAST FILLING';
                             } else if (isSelected) {
-                                statusBadgeBg = 'bg-green-500';
+                                statusBadgeBg = 'bg-primary';
                                 statusText = 'text-white';
                                 statusLabel = 'Selected';
                             }
 
                             // Selection Border Override
                             if (isSelected) {
-                                containerBorder = 'border-green-500 bg-gray-900'; // Highlight
+                                containerBorder = 'border-primary bg-gray-900'; // Highlight
                             } else if (!isBooked) {
                                 containerBorder = 'border-green-900/40 bg-gray-900/40';
                             } else {
@@ -191,7 +191,7 @@ export const SlotSelection = () => {
                                         {isBooked ? (
                                             <Ionicons name="ban-outline" size={20} color="#ef4444" />
                                         ) : (
-                                            <View className={`w-5 h-5 rounded-full border ${isSelected ? 'bg-green-500 border-green-500' : 'border-gray-500'}`} />
+                                            <View className={`w-5 h-5 rounded-full border ${isSelected ? 'bg-primary border-primary' : 'border-gray-500'}`} />
                                         )}
                                     </View>
 

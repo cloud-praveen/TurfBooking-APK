@@ -104,7 +104,7 @@ const CategoryChip = ({
 }) => (
     <TouchableOpacity
         onPress={onPress}
-        className={`flex-row items-center px-4 py-2 rounded-full mr-3 border ${isSelected ? 'bg-green-500 border-green-500' : 'bg-transparent border-gray-600'
+        className={`flex-row items-center px-4 py-2 rounded-full mr-3 border ${isSelected ? 'bg-primary border-primary' : 'bg-transparent border-gray-600'
             }`}
     >
         {category.type === 'MaterialCommunityIcons' ? (
@@ -250,7 +250,7 @@ export const HomeScreen = () => {
 
     if (viewMode === 'grid') {
         return (
-            <SafeAreaView className="flex-1 bg-gray-950">
+            <SafeAreaView className="flex-1 bg-background">
                 <View className="px-5 py-2 flex-row items-center mb-4">
                     <TouchableOpacity onPress={() => setViewMode('home')} className="bg-gray-800 p-2 rounded-full mr-4">
                         <Ionicons name="arrow-back" size={24} color="white" />
@@ -287,7 +287,7 @@ export const HomeScreen = () => {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-950 relative">
+        <SafeAreaView className="flex-1 bg-background relative">
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 120 }}>
 
                 {/* Header */}
@@ -302,7 +302,7 @@ export const HomeScreen = () => {
                     </View>
                     <TouchableOpacity
                         onPress={() => setShowDatePicker(true)}
-                        className="flex-row items-center bg-green-500/20 px-3 py-1.5 rounded-full border border-green-500/30"
+                        className="flex-row items-center bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30"
                     >
                         <Ionicons name="calendar-outline" size={14} color="#22c55e" />
                         <Text className="text-white text-xs font-medium ml-1">{formatDate(date)}</Text>
@@ -332,7 +332,7 @@ export const HomeScreen = () => {
                                     />
                                     <TouchableOpacity
                                         onPress={() => setShowDatePicker(false)}
-                                        className="mt-4 bg-green-500 px-6 py-2 rounded-full"
+                                        className="mt-4 bg-primary px-6 py-2 rounded-full"
                                     >
                                         <Text className="text-white font-bold">Done</Text>
                                     </TouchableOpacity>
@@ -363,7 +363,7 @@ export const HomeScreen = () => {
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                         />
-                        <TouchableOpacity className="bg-green-500 p-1.5 rounded-full">
+                        <TouchableOpacity className="bg-primary p-1.5 rounded-full">
                             <Ionicons name="options-outline" size={18} color="white" />
                         </TouchableOpacity>
                     </View>
@@ -406,14 +406,14 @@ export const HomeScreen = () => {
                                     coordinate={{ latitude: venue.lat, longitude: venue.lng }}
                                     title={venue.name}
                                 >
-                                    <View className="p-1 bg-white rounded-full border-2 border-green-500">
+                                    <View className="p-1 bg-white rounded-full border-2 border-primary">
                                         <MaterialCommunityIcons name="map-marker" size={20} color="black" />
                                     </View>
                                 </Marker>
                             ))}
                         </MapView>
 
-                        <TouchableOpacity className="absolute bottom-3 right-3 bg-green-500 p-3 rounded-full shadow-lg items-center justify-center">
+                        <TouchableOpacity className="absolute bottom-3 right-3 bg-primary p-3 rounded-full shadow-lg items-center justify-center">
                             <MaterialCommunityIcons name="crosshairs" size={24} color="white" />
                         </TouchableOpacity>
                     </View>
@@ -424,7 +424,7 @@ export const HomeScreen = () => {
                     <View className="flex-row items-center justify-between pr-5 mb-4">
                         <Text className="text-white text-lg font-bold">Recommended For You</Text>
                         <TouchableOpacity onPress={() => setViewMode('grid')}>
-                            <Text className="text-green-500 text-sm font-medium">See All</Text>
+                            <Text className="text-primary text-sm font-medium">See All</Text>
                         </TouchableOpacity>
                     </View>
 

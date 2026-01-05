@@ -16,7 +16,7 @@ export const UserDetailsScreen = () => {
     };
 
     return (
-        <ScrollView className="flex-1 bg-[#090C15]" contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView className="flex-1 bg-background" contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header/Title Area */}
             <View className="pt-16 pb-6 items-center">
                 <View className="w-32 h-6 bg-gray-700 rounded-full mb-6 opacity-30" />
@@ -44,12 +44,12 @@ export const UserDetailsScreen = () => {
 
             {/* Form Section */}
             <View className="w-full px-8">
-                <Text className="text-[#1DB954] text-xl font-bold mb-8 text-center">Enter User name and DOB</Text>
+                <Text className="text-primary text-xl font-bold mb-8 text-center">Enter User name and DOB</Text>
 
                 {/* User Name Input */}
                 <View className="mb-6">
                     <Text className="text-gray-400 text-xs font-semibold mb-2 ml-1">User name</Text>
-                    <View className="flex-row items-center bg-[#252A3A] rounded-xl h-14 px-4 border border-gray-700">
+                    <View className="flex-row items-center bg-surface-light rounded-xl h-14 px-4 border border-gray-700">
                         <TextInput
                             placeholder="Create User name"
                             placeholderTextColor="#6B7280"
@@ -78,7 +78,7 @@ export const UserDetailsScreen = () => {
                 {/* Submit Button */}
                 <TouchableOpacity
                     onPress={handleSubmit}
-                    className="w-full bg-[#1DB954] h-14 rounded-full flex-row items-center justify-center shadow-lg shadow-green-900/50 mb-8"
+                    className="w-full bg-primary h-14 rounded-full flex-row items-center justify-center shadow-lg shadow-green-900/50 mb-8"
                 >
                     <Text className="text-white text-base font-bold mr-2">Get in the Game</Text>
                     <Ionicons name="arrow-forward" size={20} color="white" />

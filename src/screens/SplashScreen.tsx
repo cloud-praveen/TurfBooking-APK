@@ -18,8 +18,8 @@ export const SplashScreen = () => {
   }, [navigation]);
 
   return (
-    <View className="flex-1 bg-[#10141E] items-center justify-between py-12">
-      <StatusBar barStyle="light-content" backgroundColor="#10141E" />
+    <View className="flex-1 bg-background items-center justify-between py-12">
+      <StatusBar barStyle="light-content" backgroundColor="#090C15" />
 
       <View />
 
@@ -70,11 +70,11 @@ export const SplashScreen = () => {
         {/* Title */}
         <View className="flex-row items-center mb-2">
           <Text className="text-white text-4xl font-bold">Turf</Text>
-          <Text className="text-[#159947] text-4xl font-bold ml-2">Time</Text>
+          <Text className="text-primary-dark text-4xl font-bold ml-2">Time</Text>
         </View>
 
         {/* Subtitle */}
-        <Text className="text-[#D9D9D9] text-sm">Book . Play . Repeat</Text>
+        <Text className="text-text-secondary text-sm">Book . Play . Repeat</Text>
       </View>
 
       {/* Footer / Loading */}

@@ -58,7 +58,7 @@ const ProgressBar = ({ percentage }: { percentage: number }) => (
 export const TurfDetails = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     return (
-        <View className="flex-1 bg-gray-950">
+        <View className="flex-1 bg-background">
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 100 }}>
 
                 {/* --- Header Image Section --- */}
@@ -107,7 +107,7 @@ export const TurfDetails = () => {
                                 <Ionicons name="star" size={12} color="black" />
                                 <Text className="text-black text-xs font-bold ml-1">4.8</Text>
                             </View>
-                            <Text className="text-green-500 text-[10px] underline mt-1">120 Reviews</Text>
+                            <Text className="text-primary text-[10px] underline mt-1">120 Reviews</Text>
                         </View>
                     </View>
 
@@ -126,7 +126,7 @@ export const TurfDetails = () => {
                             Welcome to Vilvam Sports Arena, a premier destination for athletes of all ages and skill levels in Coimbatore! From looking for a premier Sports Academy in Coimbatore or looking for a place to...
                         </Text>
                         <TouchableOpacity>
-                            <Text className="text-green-500 text-xs font-bold mt-1">Read More</Text>
+                            <Text className="text-primary text-xs font-bold mt-1">Read More</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -135,7 +135,7 @@ export const TurfDetails = () => {
                         <View className="flex-row justify-between items-center mb-4">
                             <Text className="text-white text-lg font-bold">Location</Text>
                             <TouchableOpacity>
-                                <Text className="text-green-500 text-xs font-bold">Open Maps</Text>
+                                <Text className="text-primary text-xs font-bold">Open Maps</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -191,14 +191,14 @@ export const TurfDetails = () => {
                         <View className="flex-row justify-between items-center mb-4">
                             <Text className="text-white text-lg font-bold">Reviews</Text>
                             <TouchableOpacity>
-                                <Text className="text-green-500 text-xs font-bold">See All</Text>
+                                <Text className="text-primary text-xs font-bold">See All</Text>
                             </TouchableOpacity>
                         </View>
 
                         <View className="bg-gray-900 p-5 rounded-3xl border border-gray-800">
                             <View className="flex-row mb-6">
                                 <View className="items-center justify-center mr-6">
-                                    <Text className="text-green-500 text-5xl font-black">4.8</Text>
+                                    <Text className="text-primary text-5xl font-black">4.8</Text>
                                     <View className="flex-row">
                                         {[1, 2, 3, 4, 5].map(i => <Ionicons key={i} name="star" size={10} color="#fbbf24" />)}
                                     </View>
