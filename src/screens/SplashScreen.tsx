@@ -2,7 +2,21 @@ import React from "react";
 import { View, Text, StatusBar, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
 export const SplashScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.replace('Login');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [navigation]);
+
   return (
     <View className="flex-1 bg-[#10141E] items-center justify-between py-12">
       <StatusBar barStyle="light-content" backgroundColor="#10141E" />

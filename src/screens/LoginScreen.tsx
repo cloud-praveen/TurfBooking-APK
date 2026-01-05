@@ -2,7 +2,19 @@ import React from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesome5, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
 export const LoginScreen = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [phoneNumber, setPhoneNumber] = React.useState('');
+
+    const handleGetOtp = () => {
+        // In a real app, validate phone number here
+        navigation.navigate('OtpVerification', { phoneNumber });
+    };
+
     return (
         <ScrollView className="flex-1 bg-[#090C15]" contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header/Title Area */}
@@ -25,7 +37,7 @@ export const LoginScreen = () => {
 
                     <View className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <View className="w-12 h-12 bg-[#E0E2D8] rounded-full items-center justify-center mb-2">
-                        <MaterialCommunityIcons name="cricket" size={25} color="#159947" />
+                            <MaterialCommunityIcons name="cricket" size={25} color="#159947" />
                         </View>
                         <Text className="text-white text-2xl font-bold">Game On !</Text>
                         <Text className="text-gray-300 text-xs">Join the league of champions today</Text>
@@ -45,13 +57,18 @@ export const LoginScreen = () => {
                     <TextInput
                         placeholder="Phone Number"
                         placeholderTextColor="#6B7280"
-                        className=" text-white text-center "
+                        className="flex-1 h-full text-white text-left"
                         keyboardType="phone-pad"
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
                     />
                 </View>
 
                 {/* Get OTP Button */}
-                <TouchableOpacity className="w-full bg-[#1DB954] h-14 rounded-full items-center justify-center shadow-lg shadow-green-900/50 mb-8">
+                <TouchableOpacity
+                    onPress={handleGetOtp}
+                    className="w-full bg-[#1DB954] h-14 rounded-full items-center justify-center shadow-lg shadow-green-900/50 mb-8"
+                >
                     <Text className="text-white text-base font-bold">Get OTP</Text>
                 </TouchableOpacity>
 

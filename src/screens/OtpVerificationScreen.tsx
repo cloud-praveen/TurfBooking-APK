@@ -2,7 +2,20 @@ import React from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
 export const OtpVerificationScreen = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, 'OtpVerification'>>();
+    const { phoneNumber } = route.params;
+
+    const handleVerifyParams = () => {
+        // Validate OTP here
+        navigation.replace('UserDetails');
+    };
+
     return (
         <ScrollView className="flex-1 bg-[#090C15]" contentContainerStyle={{ flexGrow: 1 }}>
             {/* Header/Title Area */}
@@ -34,7 +47,7 @@ export const OtpVerificationScreen = () => {
             {/* Form Section */}
             <View className="w-full px-8">
                 <Text className="text-[#1DB954] text-xl font-bold mb-1">Verify Your Number</Text>
-                <Text className="text-white text-sm mb-6">Enter the code we've sent by text to <Text className="font-bold text-white">+91 8428666442</Text></Text>
+                <Text className="text-white text-sm mb-6">Enter the code we've sent by text to <Text className="font-bold text-white">{phoneNumber || '+91 8428666442'}</Text></Text>
 
                 {/* OTP Input - Simplified as one field for now as per design mockup visual */}
                 <View className="flex-row items-center bg-[#252A3A] rounded-full h-14 px-4 border border-gray-700 mb-2 justify-center">
@@ -57,7 +70,10 @@ export const OtpVerificationScreen = () => {
                 </View>
 
                 {/* Submit Button */}
-                <TouchableOpacity className="w-full bg-[#1DB954] h-14 rounded-full flex-row items-center justify-center shadow-lg shadow-green-900/50 mb-8">
+                <TouchableOpacity
+                    onPress={handleVerifyParams}
+                    className="w-full bg-[#1DB954] h-14 rounded-full flex-row items-center justify-center shadow-lg shadow-green-900/50 mb-8"
+                >
                     <Text className="text-white text-base font-bold mr-2">Get in the Game</Text>
                     <Ionicons name="arrow-forward" size={20} color="white" />
                 </TouchableOpacity>
