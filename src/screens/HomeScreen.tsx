@@ -16,6 +16,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import MapView, { Marker } from 'react-native-maps';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
+import { BottomNavBar } from '../components/BottomNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -161,26 +162,7 @@ const VenueCard = ({ venue, fullWidth = false }: { venue: Venue, fullWidth?: boo
     </View>
 );
 
-const BottomNavBar = () => (
-    <View className="absolute bottom-0 left-0 right-0 bg-white flex-row justify-between px-8 py-4 pb-8 rounded-t-3xl shadow-lg border-t border-gray-100">
-        <TouchableOpacity className="items-center">
-            <Ionicons name="home" size={24} color="#1f2937" />
-            <Text className="text-[10px] font-bold text-gray-900 mt-1">Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-            <MaterialCommunityIcons name="ticket-outline" size={24} color="#9ca3af" />
-            <Text className="text-[10px] font-medium text-gray-400 mt-1">Bookings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-            <Ionicons name="people-outline" size={24} color="#9ca3af" />
-            <Text className="text-[10px] font-medium text-gray-400 mt-1">Teams</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-            <Ionicons name="person-outline" size={24} color="#9ca3af" />
-            <Text className="text-[10px] font-medium text-gray-400 mt-1">Profile</Text>
-        </TouchableOpacity>
-    </View>
-);
+// BottomNavBar is now imported from components
 
 export const HomeScreen = () => {
     const [activeCategory, setActiveCategory] = useState('1');

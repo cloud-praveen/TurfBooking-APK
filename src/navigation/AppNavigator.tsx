@@ -8,6 +8,8 @@ import { TurfDetails } from '../screens/TurfDetails';
 import { SlotSelection } from '../screens/SlotSelection';
 import { BookingSummary } from '../screens/BookingSummary';
 import { UserDetailsScreen } from '../screens/UserDetailsScreen';
+import { BookingsScreen } from '../screens/BookingsScreen';
+import { ProfileScreen } from '../screens/ProfileScreen';
 
 export type RootStackParamList = {
     Splash: undefined;
@@ -18,6 +20,8 @@ export type RootStackParamList = {
     TurfDetails: { turfId?: string };
     SlotSelection: { turfId?: string };
     BookingSummary: { slotId?: string };
+    Bookings: undefined;
+    Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -43,6 +47,8 @@ export const AppNavigator = () => {
             <Stack.Screen name="TurfDetails" component={TurfDetails} />
             <Stack.Screen name="SlotSelection" component={SlotSelection} />
             <Stack.Screen name="BookingSummary" component={BookingSummary} />
+            <Stack.Screen name="Bookings" component={BookingsScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
         </Stack.Navigator>
     );
 };
