@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import { BottomNavBar } from '../components/BottomNavBar';
 import { COLORS } from '../constants/colors';
 
-// Mock Data
 const UPCOMING_BOOKINGS = [
     {
         id: '1',
