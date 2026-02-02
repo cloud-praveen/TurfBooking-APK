@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
     ScrollView,
     TouchableOpacity,
     Dimensions,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { RootStackParamList } from '../types/navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../constants/api';
 
 const { width } = Dimensions.get('window');
 
@@ -38,11 +42,59 @@ const SLOTS = [
 ];
 
 export const SlotSelection = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, 'SlotSelection'>>();
+    const { turfId } = route.params;
+
+    const [venue, setVenue] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState('2025-10-14');
     const [selectedFilter, setSelectedFilter] = useState('All');
-    // For demo purposes, managing selection by ID. In real app this would be more complex.
-    const [selectedSlotId, setSelectedSlotId] = useState<string | null>('2');
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchVenueDetails();
+    }, [turfId]);
+
+    const fetchVenueDetails = async () => {
+        setLoading(true);
+        try {
+            const token = await AsyncStorage.getItem('userToken');
+            const url = `${API_BASE_URL}/turf/${turfId}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setVenue(data);
+            } else {
+                Alert.alert("Error", data.message || "Failed to fetch venue details");
+                navigation.goBack();
+            }
+        } catch (error) {
+            console.error("API Error fetching venue details:", error);
+            Alert.alert("Error", "Something went wrong while fetching venue details");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <View className="flex-1 bg-background justify-center items-center">
+                <ActivityIndicator size="large" color="#22c55e" />
+            </View>
+        );
+    }
+
+    if (!venue) return null;
 
     const handleSlotPress = (id: string, status: SlotStatus) => {
         if (status === 'booked') return;
@@ -62,10 +114,9 @@ export const SlotSelection = () => {
 
                     {/* Title Block */}
                     <View className="items-center mb-6">
-                        {/* Pill background effect behind title if needed, but per design it looks like just text on dark */}
                         <View className="bg-gray-800/50 px-8 py-4 rounded-[40px] items-center w-full">
-                            <Text className="text-white text-xl font-bold">Vilvam Turf</Text>
-                            <Text className="text-gray-400 text-xs">Cricket Turf</Text>
+                            <Text className="text-white text-xl font-bold">{venue.name}</Text>
+                            <Text className="text-gray-400 text-xs">{venue.sport || 'Sports Turf'}</Text>
                         </View>
                     </View>
 
@@ -219,13 +270,19 @@ export const SlotSelection = () => {
                 <View>
                     <Text className="text-gray-400 text-xs font-medium">Price</Text>
                     <View className="flex-row items-end">
-                        <Text className="text-white text-xl font-bold">₹ 1500</Text>
+                        <Text className="text-white text-xl font-bold">₹ {venue.price || '0'}</Text>
                         <Text className="text-gray-500 text-xs mb-1 ml-1">/ 1 Slot</Text>
                     </View>
                 </View>
                 <TouchableOpacity
                     className="bg-green-500 px-6 py-3 rounded-xl flex-row items-center"
-                    onPress={() => navigation.navigate('BookingSummary', { slotId: selectedSlotId || '' })}
+                    onPress={() => {
+                        if (selectedSlotId) {
+                            navigation.navigate('BookingSummary', { slotId: selectedSlotId });
+                        } else {
+                            Alert.alert("Selection Required", "Please select a slot before proceeding");
+                        }
+                    }}
                 >
                     <Text className="text-gray-900 font-bold mr-2">Proceed To Pay</Text>
                     <Ionicons name="arrow-forward" size={18} color="#111827" />

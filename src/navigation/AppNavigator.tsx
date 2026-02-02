@@ -1,5 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
+
 import { SplashScreen } from '../screens/SplashScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { OtpVerificationScreen } from '../screens/OtpVerificationScreen';
@@ -10,27 +12,36 @@ import { BookingSummary } from '../screens/BookingSummary';
 import { UserDetailsScreen } from '../screens/UserDetailsScreen';
 import { BookingsScreen } from '../screens/BookingsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { TeamsScreen } from '../screens/TeamsScreen';
+import { CreateTeam } from '../screens/CreateTeam';
+import { CreateMatch } from '../screens/CreateMatch';
+import { InvitesScreen } from '../screens/InvitesScreen';
+import { AddTeamMembers } from '../screens/AddTeamMembers';
+import { CreateSquad } from '../screens/CreateSquad';
+import { MatchSummary } from '../screens/MatchSummary';
+import ScoreboardUpdate from '../screens/ScoreboardUpdate';
+import { AdminHomeScreen } from '../screens/admin/AdminHomeScreen';
+import { MyPropertiesScreen } from '../screens/admin/MyPropertiesScreen';
+import { AdminBookingsScreen } from '../screens/admin/AdminBookingsScreen';
+import { TossSelectionScreen } from '../screens/TossSelectionScreen';
+import { SecondInningsSelectionScreen } from '../screens/SecondInningsSelectionScreen';
 
-export type RootStackParamList = {
-    Splash: undefined;
-    Login: undefined;
-    OtpVerification: { phoneNumber?: string };
-    UserDetails: undefined;
-    Home: undefined;
-    TurfDetails: { turfId?: string };
-    SlotSelection: { turfId?: string };
-    BookingSummary: { slotId?: string };
-    Bookings: undefined;
-    Profile: undefined;
-};
+
+
+
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
 
 export const AppNavigator = () => {
     return (
         <Stack.Navigator
             initialRouteName="Splash"
+
+            // Force refresh context
             screenOptions={{
+
                 headerShown: false,
                 animation: 'slide_from_right',
             }}
@@ -49,6 +60,22 @@ export const AppNavigator = () => {
             <Stack.Screen name="BookingSummary" component={BookingSummary} />
             <Stack.Screen name="Bookings" component={BookingsScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Teams" component={TeamsScreen} />
+            <Stack.Screen name="CreateTeam" component={CreateTeam} />
+            <Stack.Screen name="CreateMatch" component={CreateMatch} />
+            <Stack.Screen name="Invites" component={InvitesScreen} />
+            <Stack.Screen name="AddTeamMembers" component={AddTeamMembers} />
+            <Stack.Screen name="CreateSquad" component={CreateSquad} />
+            <Stack.Screen name="MatchSummary" component={MatchSummary} />
+            <Stack.Screen name="TossSelection" component={TossSelectionScreen} />
+            <Stack.Screen name="SecondInningsSelection" component={SecondInningsSelectionScreen} />
+            <Stack.Screen name="ScoreboardUpdate" component={ScoreboardUpdate} />
+
+            <Stack.Screen name="AdminHome" component={AdminHomeScreen} />
+            <Stack.Screen name="AdminProperties" component={MyPropertiesScreen} />
+            <Stack.Screen name="AdminBookings" component={AdminBookingsScreen} />
         </Stack.Navigator>
+
+
     );
 };

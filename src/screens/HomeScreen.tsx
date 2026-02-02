@@ -10,6 +10,8 @@ import {
     Platform,
     FlatList,
     Modal,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,6 +19,7 @@ import MapView, { Marker } from 'react-native-maps';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { BottomNavBar } from '../components/BottomNavBar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -38,6 +41,7 @@ interface Venue {
     lat: number;
     lng: number;
     sport: string;
+    city?: string;
 }
 
 const CATEGORIES: Category[] = [
@@ -45,53 +49,6 @@ const CATEGORIES: Category[] = [
     { id: '2', name: 'Soccer', icon: 'soccer', type: 'MaterialCommunityIcons' },
     { id: '3', name: 'Badminton', icon: 'badminton', type: 'MaterialCommunityIcons' },
     { id: '4', name: 'Tennis', icon: 'tennis-ball', type: 'Ionicons' },
-];
-
-const VENUES: Venue[] = [
-    {
-        id: '1',
-        name: 'Vilvam Turf',
-        distance: '1.2 km away',
-        price: '1500 / per hour',
-        rating: 4.8,
-        image: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        lat: 11.0805,
-        lng: 76.9945,
-        sport: 'Cricket',
-    },
-    {
-        id: '2',
-        name: 'Sixer Zone',
-        distance: '2.5 km away',
-        price: '1200 / per hour',
-        rating: 4.5,
-        image: 'https://images.unsplash.com/photo-1517747614396-d21a78b850e8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1482&q=80',
-        lat: 11.0850,
-        lng: 77.0000,
-        sport: 'Soccer',
-    },
-    {
-        id: '3',
-        name: 'Smash Court',
-        distance: '3.0 km away',
-        price: '800 / per hour',
-        rating: 4.2,
-        image: 'https://images.unsplash.com/photo-1626224583764-84786c713066?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        lat: 11.0900,
-        lng: 77.0100,
-        sport: 'Badminton',
-    },
-    {
-        id: '4',
-        name: 'Pro Arena',
-        distance: '0.8 km away',
-        price: '1000 / per hour',
-        rating: 4.6,
-        image: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        lat: 11.0700,
-        lng: 76.9800,
-        sport: 'Tennis',
-    },
 ];
 
 const CategoryChip = ({
@@ -127,8 +84,12 @@ const CategoryChip = ({
     </TouchableOpacity>
 );
 
-const VenueCard = ({ venue, fullWidth = false }: { venue: Venue, fullWidth?: boolean }) => (
-    <View className={`${fullWidth ? 'w-[48%] mb-4' : 'w-72 mr-4'} h-64 bg-gray-800 rounded-3xl overflow-hidden relative border border-gray-700`}>
+const VenueCard = ({ venue, fullWidth = false, onPress }: { venue: Venue, fullWidth?: boolean, onPress?: () => void }) => (
+    <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.8}
+        className={`${fullWidth ? 'w-[48%] mb-4' : 'w-72 mr-4'} h-64 bg-gray-800 rounded-3xl overflow-hidden relative border border-gray-700`}
+    >
         <Image source={{ uri: venue.image }} className="w-full h-32" resizeMode="cover" />
 
         <View className="absolute top-2 left-2 bg-white/90 px-1.5 py-0.5 rounded-full flex-row items-center">
@@ -154,18 +115,22 @@ const VenueCard = ({ venue, fullWidth = false }: { venue: Venue, fullWidth?: boo
                     <Text className="text-gray-400 text-[8px] uppercase font-bold">Price</Text>
                     <Text className="text-gray-300 text-[10px]">{venue.price}</Text>
                 </View>
-                <TouchableOpacity className="bg-white px-3 py-1.5 rounded-full">
+                <View className="bg-white px-3 py-1.5 rounded-full">
                     <Text className="text-black font-bold text-[10px]">BOOK</Text>
-                </TouchableOpacity>
+                </View>
             </View>
         </View>
-    </View>
+    </TouchableOpacity>
 );
 
-// BottomNavBar is now imported from components
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
+import { API_BASE_URL } from '../constants/api';
 
 export const HomeScreen = () => {
-    const [activeCategory, setActiveCategory] = useState('1');
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -173,6 +138,58 @@ export const HomeScreen = () => {
     const [location, setLocation] = useState<any>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [displayAddress, setDisplayAddress] = useState('Locating...');
+    const [venues, setVenues] = useState<Venue[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [lastCitySearch, setLastCitySearch] = useState('');
+
+    const fetchTurfs = async (params: { lat?: number; lng?: number; city?: string }) => {
+        setLoading(true);
+        try {
+            const token = await AsyncStorage.getItem('userToken');
+            let url = `${API_BASE_URL}/turf`;
+
+            if (params.city) {
+                url += `?city=${encodeURIComponent(params.city)}`;
+                setLastCitySearch(params.city);
+            } else if (params.lat && params.lng) {
+                url += `?lat=${params.lat}&lng=${params.lng}`;
+            }
+
+            console.log("Fetching turfs from:", url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const mappedVenues = data.map((item: any) => ({
+                    id: item.id || item._id,
+                    name: item.name,
+                    distance: item.distance ? `${parseFloat(item.distance).toFixed(1)} km away` : 'Near you',
+                    price: item.price ? `${item.price} / per hour` : 'Price on request',
+                    rating: parseFloat(item.rating) || 4.5,
+                    image: item.image || (item.images && item.images[0]) || 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                    lat: parseFloat(item.lat || item.latitude),
+                    lng: parseFloat(item.lng || item.longitude),
+                    sport: item.sport || item.category || 'Multi-sport',
+                    city: item.city
+                }));
+                setVenues(mappedVenues);
+                if (params.city) setDisplayAddress(params.city);
+            } else {
+                console.warn("Failed to fetch turfs:", data.message);
+            }
+        } catch (error) {
+            console.error("API Error fetching turfs:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     React.useEffect(() => {
         (async () => {
@@ -180,32 +197,38 @@ export const HomeScreen = () => {
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
                 setDisplayAddress('Permission Denied');
+                fetchTurfs({ lat: 12.9352, lng: 77.6245 });
                 return;
             }
 
             let location = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.Highest,
             });
+            const { latitude, longitude } = location.coords;
             setLocation({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
+                latitude,
+                longitude,
                 latitudeDelta: 0.05,
                 longitudeDelta: 0.05,
             });
 
-            // Reverse Geocoding to get address
-            let address = await Location.reverseGeocodeAsync({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
-            });
+            fetchTurfs({ lat: latitude, lng: longitude });
+
+            let address = await Location.reverseGeocodeAsync({ latitude, longitude });
 
             if (address && address.length > 0) {
                 const city = address[0].city || address[0].region || address[0].subregion;
-                const area = address[0].district || address[0].street; // Fallback or combination
+                const area = address[0].district || address[0].street;
                 setDisplayAddress(city ? `${area ? area + ', ' : ''}${city}` : 'Unknown Location');
             }
         })();
     }, []);
+
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            fetchTurfs({ city: searchQuery.trim() });
+        }
+    };
 
     const onChangeDate = (event: any, selectedDate?: Date) => {
         const currentDate = selectedDate || date;
@@ -225,10 +248,22 @@ export const HomeScreen = () => {
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     };
 
-    const filteredVenues = VENUES.filter(venue =>
-        venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        venue.sport.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredVenues = venues.filter(venue => {
+        // If the query matches the city we just searched for via API, we show all results 
+        // to avoid "No venues found" just because the venue name doesn't contain the city name.
+        const matchesCitySearch = lastCitySearch && searchQuery.toLowerCase() === lastCitySearch.toLowerCase();
+
+        const matchesSearch = matchesCitySearch ||
+            venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            venue.sport.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (venue.city && venue.city.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        const category = CATEGORIES.find(c => c.id === activeCategory);
+        const matchesCategory = category ?
+            venue.sport.toLowerCase().includes(category.name.toLowerCase()) : true;
+
+        return matchesSearch && matchesCategory;
+    });
 
     if (viewMode === 'grid') {
         return (
@@ -250,19 +285,33 @@ export const HomeScreen = () => {
                             className="flex-1 ml-2 text-black text-sm"
                             value={searchQuery}
                             onChangeText={setSearchQuery}
+                            onSubmitEditing={handleSearch}
                         />
+                        {loading && <ActivityIndicator size="small" color="#22c55e" className="ml-2" />}
                     </View>
                 </View>
 
-                <FlatList
-                    data={filteredVenues}
-                    keyExtractor={item => item.id}
-                    numColumns={2}
-                    columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 20 }}
-                    renderItem={({ item }) => <VenueCard venue={item} fullWidth={true} />}
-                    contentContainerStyle={{ paddingBottom: 120 }}
-                />
-                {/* Added BottomNavBar to Grid View as well for consistency */}
+                {loading && venues.length === 0 ? (
+                    <View className="flex-1 justify-center items-center">
+                        <ActivityIndicator size="large" color="#22c55e" />
+                    </View>
+                ) : (
+                    <FlatList
+                        data={filteredVenues}
+                        keyExtractor={item => item.id}
+                        numColumns={2}
+                        columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 20 }}
+                        renderItem={({ item }) => (
+                            <VenueCard
+                                venue={item}
+                                fullWidth={true}
+                                onPress={() => navigation.navigate('TurfDetails', { turfId: item.id })}
+                            />
+                        )}
+                        contentContainerStyle={{ paddingBottom: 120 }}
+                        ListEmptyComponent={<Text className="text-gray-500 text-center mt-10">No venues found.</Text>}
+                    />
+                )}
                 <BottomNavBar />
             </SafeAreaView>
         );
@@ -344,8 +393,10 @@ export const HomeScreen = () => {
                             className="flex-1 ml-2 text-black text-sm"
                             value={searchQuery}
                             onChangeText={setSearchQuery}
+                            onSubmitEditing={handleSearch}
                         />
-                        <TouchableOpacity className="bg-primary p-1.5 rounded-full">
+                        {loading && <ActivityIndicator size="small" color="#22c55e" className="mr-2" />}
+                        <TouchableOpacity onPress={handleSearch} className="bg-primary p-1.5 rounded-full">
                             <Ionicons name="options-outline" size={18} color="white" />
                         </TouchableOpacity>
                     </View>
@@ -362,7 +413,7 @@ export const HomeScreen = () => {
                             key={cat.id}
                             category={cat}
                             isSelected={activeCategory === cat.id}
-                            onPress={() => setActiveCategory(cat.id)}
+                            onPress={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
                         />
                     ))}
                     <View className="w-5" />
@@ -374,15 +425,15 @@ export const HomeScreen = () => {
                         <MapView
                             style={{ width: '100%', height: '100%' }}
                             initialRegion={{
-                                latitude: 11.0805,
-                                longitude: 76.9945,
+                                latitude: 12.9352,
+                                longitude: 77.6245,
                                 latitudeDelta: 0.05,
                                 longitudeDelta: 0.05,
                             }}
                             region={location || undefined}
                             showsUserLocation={true}
                         >
-                            {VENUES.map(venue => (
+                            {venues.map(venue => (
                                 <Marker
                                     key={venue.id}
                                     coordinate={{ latitude: venue.lat, longitude: venue.lng }}
@@ -410,17 +461,27 @@ export const HomeScreen = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                    >
-                        {filteredVenues.length > 0 ? filteredVenues.map((venue) => (
-                            <VenueCard key={venue.id} venue={venue} />
-                        )) : (
-                            <Text className="text-gray-500 italic">No venues found.</Text>
-                        )}
-                        <View className="w-5" />
-                    </ScrollView>
+                    {loading && venues.length === 0 ? (
+                        <View className="h-40 justify-center items-center">
+                            <ActivityIndicator size="large" color="#22c55e" />
+                        </View>
+                    ) : (
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                        >
+                            {filteredVenues.length > 0 ? filteredVenues.map((venue) => (
+                                <VenueCard
+                                    key={venue.id}
+                                    venue={venue}
+                                    onPress={() => navigation.navigate('TurfDetails', { turfId: venue.id })}
+                                />
+                            )) : (
+                                <Text className="text-gray-500 italic">No venues found.</Text>
+                            )}
+                            <View className="w-5" />
+                        </ScrollView>
+                    )}
                 </View>
 
             </ScrollView>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -7,13 +7,17 @@ import {
     TouchableOpacity,
     Dimensions,
     FlatList,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import MapView, { Marker } from 'react-native-maps';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { RootStackParamList } from '../types/navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../constants/api';
 
 const { width } = Dimensions.get('window');
 // --- Mock Data ---
@@ -57,6 +61,61 @@ const ProgressBar = ({ percentage }: { percentage: number }) => (
 
 export const TurfDetails = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const route = useRoute<RouteProp<RootStackParamList, 'TurfDetails'>>();
+    const { turfId } = route.params;
+
+    const [venue, setVenue] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchTurfDetails();
+    }, [turfId]);
+
+    const fetchTurfDetails = async () => {
+        setLoading(true);
+        try {
+            const token = await AsyncStorage.getItem('userToken');
+            const url = `${API_BASE_URL}/turf/${turfId}`;
+            console.log("Fetching turf details from:", url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setVenue(data);
+            } else {
+                Alert.alert("Error", data.message || "Failed to fetch turf details");
+                navigation.goBack();
+            }
+        } catch (error) {
+            console.error("API Error fetching turf details:", error);
+            Alert.alert("Error", "Something went wrong while fetching turf details");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <View className="flex-1 bg-background justify-center items-center">
+                <ActivityIndicator size="large" color="#22c55e" />
+            </View>
+        );
+    }
+
+    if (!venue) return null;
+
+    const images = venue.images && venue.images.length > 0 ? venue.images : [venue.image || 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'];
+    const lat = parseFloat(venue.lat || venue.latitude || 0);
+    const lng = parseFloat(venue.lng || venue.longitude || 0);
+
     return (
         <View className="flex-1 bg-background">
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 100 }}>
@@ -64,7 +123,7 @@ export const TurfDetails = () => {
                 {/* --- Header Image Section --- */}
                 <View className="relative h-72">
                     <Image
-                        source={{ uri: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' }}
+                        source={{ uri: images[0] }}
                         className="w-full h-full"
                         resizeMode="cover"
                     />
@@ -84,9 +143,9 @@ export const TurfDetails = () => {
                         </TouchableOpacity>
                     </SafeAreaView>
 
-                    {/* Pagination Dots (Static for now) */}
+                    {/* Pagination Dots */}
                     <View className="absolute bottom-4 left-0 right-0 flex-row justify-center space-x-2">
-                        {[1, 2, 3, 4].map((dot, index) => (
+                        {images.map((_: any, index: number) => (
                             <View key={index} className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-white' : 'bg-white/50'}`} />
                         ))}
                     </View>
@@ -95,19 +154,19 @@ export const TurfDetails = () => {
                 {/* --- Title & Info --- */}
                 <View className="px-5 pt-6">
                     <View className="flex-row justify-between items-start">
-                        <View>
-                            <Text className="text-white text-2xl font-bold">Vilvam Turf</Text>
+                        <View className="flex-1">
+                            <Text className="text-white text-2xl font-bold">{venue.name}</Text>
                             <View className="flex-row items-center mt-1">
                                 <Ionicons name="location-outline" size={14} color="#22c55e" />
-                                <Text className="text-gray-400 text-xs ml-1">Saravanampatti, CBE</Text>
+                                <Text className="text-gray-400 text-xs ml-1" numberOfLines={1}>{venue.address || venue.city || 'Location unavailable'}</Text>
                             </View>
                         </View>
-                        <View className="items-end">
+                        <View className="items-end ml-2">
                             <View className="bg-white px-2 py-1 rounded-lg flex-row items-center">
                                 <Ionicons name="star" size={12} color="black" />
-                                <Text className="text-black text-xs font-bold ml-1">4.8</Text>
+                                <Text className="text-black text-xs font-bold ml-1">{parseFloat(venue.rating || 4.5).toFixed(1)}</Text>
                             </View>
-                            <Text className="text-primary text-[10px] underline mt-1">120 Reviews</Text>
+                            <Text className="text-primary text-[10px] underline mt-1">{venue.reviewsCount || 0} Reviews</Text>
                         </View>
                     </View>
 
@@ -123,11 +182,13 @@ export const TurfDetails = () => {
                     <View className="mt-8">
                         <Text className="text-white text-lg font-bold mb-3">About Venue</Text>
                         <Text className="text-gray-400 text-xs leading-5">
-                            Welcome to Vilvam Sports Arena, a premier destination for athletes of all ages and skill levels in Coimbatore! From looking for a premier Sports Academy in Coimbatore or looking for a place to...
+                            {venue.description || "No description available for this venue."}
                         </Text>
-                        <TouchableOpacity>
-                            <Text className="text-primary text-xs font-bold mt-1">Read More</Text>
-                        </TouchableOpacity>
+                        {venue.description && venue.description.length > 150 && (
+                            <TouchableOpacity>
+                                <Text className="text-primary text-xs font-bold mt-1">Read More</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
 
                     {/* --- Location Map --- */}
@@ -143,20 +204,19 @@ export const TurfDetails = () => {
                             <MapView
                                 style={{ flex: 1 }}
                                 initialRegion={{
-                                    latitude: 11.0805,
-                                    longitude: 76.9945,
+                                    latitude: lat,
+                                    longitude: lng,
                                     latitudeDelta: 0.01,
                                     longitudeDelta: 0.01,
                                 }}
                                 scrollEnabled={false}
                                 zoomEnabled={false}
                             >
-                                <Marker coordinate={{ latitude: 11.0805, longitude: 76.9945 }} />
+                                <Marker coordinate={{ latitude: lat, longitude: lng }} />
                             </MapView>
-                            {/* Overlay to intercept touches if desired, or let it jump to maps */}
                         </View>
                         <Text className="text-gray-400 text-[10px] mt-3 leading-4">
-                            Easen vilayadat, Kumaraguru college back entrance, Athipalayam Rd, Ramani's Sri Mayuri Layout, Saravanampatti, Coimbatore, Tamil Nadu 641049
+                            {venue.address || 'Address not available'}
                         </Text>
                     </View>
 
@@ -245,13 +305,13 @@ export const TurfDetails = () => {
                 <View>
                     <Text className="text-gray-400 text-xs font-medium">Price</Text>
                     <View className="flex-row items-end">
-                        <Text className="text-white text-xl font-bold">₹ 1500</Text>
+                        <Text className="text-white text-xl font-bold">₹ {venue.price || '0'}</Text>
                         <Text className="text-gray-500 text-xs mb-1 ml-1">/ 1 Slot</Text>
                     </View>
                 </View>
                 <TouchableOpacity
                     className="bg-green-500 px-6 py-3 rounded-xl flex-row items-center"
-                    onPress={() => navigation.navigate('SlotSelection', { turfId: '1' })}
+                    onPress={() => navigation.navigate('SlotSelection', { turfId: venue.id })}
                 >
                     <Text className="text-gray-900 font-bold mr-2">Check Availability</Text>
                     <Ionicons name="calendar" size={18} color="#111827" />
