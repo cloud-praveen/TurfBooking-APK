@@ -23,4 +23,5 @@ export type RootStackParamList = {
 
     AdminProperties: undefined;
     AdminBookings: undefined;
+    LiveScoreView: { matchId: string };
 };

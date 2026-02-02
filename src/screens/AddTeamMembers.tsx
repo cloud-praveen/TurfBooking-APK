@@ -211,7 +211,7 @@ export const AddTeamMembers = () => {
                 </View>
 
                 {/* Search Results Section */}
-                {searchQuery.length > 0 && (
+                {searchQuery.length > 0 ? (
                     <View className="mb-6">
                         <Text className="text-white text-base font-bold mb-4">Search Results</Text>
                         {loading ? (
@@ -226,7 +226,7 @@ export const AddTeamMembers = () => {
                         ) : null}
                         <View className="h-[1px] bg-gray-800/50 my-4" />
                     </View>
-                )}
+                ) : null}
 
 
 

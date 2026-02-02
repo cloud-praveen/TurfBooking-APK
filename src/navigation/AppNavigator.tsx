@@ -25,6 +25,7 @@ import { MyPropertiesScreen } from '../screens/admin/MyPropertiesScreen';
 import { AdminBookingsScreen } from '../screens/admin/AdminBookingsScreen';
 import { TossSelectionScreen } from '../screens/TossSelectionScreen';
 import { SecondInningsSelectionScreen } from '../screens/SecondInningsSelectionScreen';
+import { LiveScoreView } from '../screens/LiveScoreView';
 
 
 
@@ -70,6 +71,7 @@ export const AppNavigator = () => {
             <Stack.Screen name="TossSelection" component={TossSelectionScreen} />
             <Stack.Screen name="SecondInningsSelection" component={SecondInningsSelectionScreen} />
             <Stack.Screen name="ScoreboardUpdate" component={ScoreboardUpdate} />
+            <Stack.Screen name="LiveScoreView" component={LiveScoreView} />
 
             <Stack.Screen name="AdminHome" component={AdminHomeScreen} />
             <Stack.Screen name="AdminProperties" component={MyPropertiesScreen} />

@@ -11,15 +11,20 @@ import {
     FlatList,
     Modal,
     ActivityIndicator,
-    Alert
+    Alert,
+    StatusBar
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import MapView, { Marker } from 'react-native-maps';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { BottomNavBar } from '../components/BottomNavBar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchVenuesRequest } from '../store/slices/turfSlice';
 
 const { width } = Dimensions.get('window');
 
@@ -123,81 +128,26 @@ const VenueCard = ({ venue, fullWidth = false, onPress }: { venue: Venue, fullWi
     </TouchableOpacity>
 );
 
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
-import { API_BASE_URL } from '../constants/api';
-
 export const HomeScreen = () => {
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const dispatch = useAppDispatch();
+
+    const { venues, loading, displayAddress } = useAppSelector(state => state.turfs);
+
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [viewMode, setViewMode] = useState<'home' | 'grid'>('home');
     const [location, setLocation] = useState<any>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [displayAddress, setDisplayAddress] = useState('Locating...');
-    const [venues, setVenues] = useState<Venue[]>([]);
-    const [loading, setLoading] = useState(false);
     const [lastCitySearch, setLastCitySearch] = useState('');
-
-    const fetchTurfs = async (params: { lat?: number; lng?: number; city?: string }) => {
-        setLoading(true);
-        try {
-            const token = await AsyncStorage.getItem('userToken');
-            let url = `${API_BASE_URL}/turf`;
-
-            if (params.city) {
-                url += `?city=${encodeURIComponent(params.city)}`;
-                setLastCitySearch(params.city);
-            } else if (params.lat && params.lng) {
-                url += `?lat=${params.lat}&lng=${params.lng}`;
-            }
-
-            console.log("Fetching turfs from:", url);
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const mappedVenues = data.map((item: any) => ({
-                    id: item.id || item._id,
-                    name: item.name,
-                    distance: item.distance ? `${parseFloat(item.distance).toFixed(1)} km away` : 'Near you',
-                    price: item.price ? `${item.price} / per hour` : 'Price on request',
-                    rating: parseFloat(item.rating) || 4.5,
-                    image: item.image || (item.images && item.images[0]) || 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                    lat: parseFloat(item.lat || item.latitude),
-                    lng: parseFloat(item.lng || item.longitude),
-                    sport: item.sport || item.category || 'Multi-sport',
-                    city: item.city
-                }));
-                setVenues(mappedVenues);
-                if (params.city) setDisplayAddress(params.city);
-            } else {
-                console.warn("Failed to fetch turfs:", data.message);
-            }
-        } catch (error) {
-            console.error("API Error fetching turfs:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     React.useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                setDisplayAddress('Permission Denied');
-                fetchTurfs({ lat: 12.9352, lng: 77.6245 });
+                dispatch(fetchVenuesRequest({ lat: 12.9352, lng: 77.6245 }));
                 return;
             }
 
@@ -212,21 +162,14 @@ export const HomeScreen = () => {
                 longitudeDelta: 0.05,
             });
 
-            fetchTurfs({ lat: latitude, lng: longitude });
-
-            let address = await Location.reverseGeocodeAsync({ latitude, longitude });
-
-            if (address && address.length > 0) {
-                const city = address[0].city || address[0].region || address[0].subregion;
-                const area = address[0].district || address[0].street;
-                setDisplayAddress(city ? `${area ? area + ', ' : ''}${city}` : 'Unknown Location');
-            }
+            dispatch(fetchVenuesRequest({ lat: latitude, lng: longitude }));
         })();
-    }, []);
+    }, [dispatch]);
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
-            fetchTurfs({ city: searchQuery.trim() });
+            setLastCitySearch(searchQuery.trim());
+            dispatch(fetchVenuesRequest({ city: searchQuery.trim() }));
         }
     };
 
@@ -249,8 +192,6 @@ export const HomeScreen = () => {
     };
 
     const filteredVenues = venues.filter(venue => {
-        // If the query matches the city we just searched for via API, we show all results 
-        // to avoid "No venues found" just because the venue name doesn't contain the city name.
         const matchesCitySearch = lastCitySearch && searchQuery.toLowerCase() === lastCitySearch.toLowerCase();
 
         const matchesSearch = matchesCitySearch ||
@@ -267,7 +208,8 @@ export const HomeScreen = () => {
 
     if (viewMode === 'grid') {
         return (
-            <SafeAreaView className="flex-1 bg-background">
+            <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
+                <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
                 <View className="px-5 py-2 flex-row items-center mb-4">
                     <TouchableOpacity onPress={() => setViewMode('home')} className="bg-gray-800 p-2 rounded-full mr-4">
                         <Ionicons name="arrow-back" size={24} color="white" />
@@ -313,12 +255,13 @@ export const HomeScreen = () => {
                     />
                 )}
                 <BottomNavBar />
-            </SafeAreaView>
+            </View>
         );
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-background relative">
+        <View className="flex-1 bg-background relative" style={{ paddingTop: insets.top }}>
+            <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 120 }}>
 
                 {/* Header */}
@@ -486,6 +429,6 @@ export const HomeScreen = () => {
 
             </ScrollView>
             <BottomNavBar />
-        </SafeAreaView>
+        </View>
     );
 };

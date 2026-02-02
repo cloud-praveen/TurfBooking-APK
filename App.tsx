@@ -6,11 +6,20 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
+const linking = {
+  prefixes: ['turfbooking://', 'https://turfbooking.com'],
+  config: {
+    screens: {
+      LiveScoreView: 'live/:matchId',
+    },
+  },
+};
+
 export default function App() {
   return (
     <Provider store={store}>
       <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           <AppNavigator />
         </NavigationContainer>
       </SafeAreaProvider>

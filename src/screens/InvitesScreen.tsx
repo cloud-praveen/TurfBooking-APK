@@ -4,7 +4,6 @@ import {
     Text,
     TouchableOpacity,
     ScrollView,
-    SafeAreaView,
     StatusBar,
     Image,
     ActivityIndicator,
@@ -13,110 +12,39 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { BottomNavBar } from '../components/BottomNavBar';
-import { API_BASE_URL } from '../constants/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface Invite {
-    inviteId: string;
-    poolName: string;
-    sportType: string;
-    invitedByName: string;
-}
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchInvitesRequest, acceptInviteRequest, declineInviteRequest } from '../store/slices/teamSlice';
 
 export const InvitesScreen = () => {
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<any>();
+    const dispatch = useAppDispatch();
+
+    const { invites, loading, error } = useAppSelector(state => state.teams);
     const [activeTab, setActiveTab] = useState<'active' | 'invites'>('invites');
-    const [invites, setInvites] = useState<Invite[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchInvites();
-    }, []);
+        dispatch(fetchInvitesRequest());
+    }, [dispatch]);
 
-    const fetchInvites = async () => {
-        setLoading(true);
-        try {
-            const token = await AsyncStorage.getItem('userToken');
-            const response = await fetch(`${API_BASE_URL}/pools/invites`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
-            });
-
-            const data = await response.json();
-            console.log("Invites API Response:", data);
-
-            if (response.ok) {
-                setInvites(data.invites || []);
-            } else {
-                Alert.alert("Error", data.message || "Failed to fetch invites");
-            }
-        } catch (error) {
-            console.error("API Error fetching invites:", error);
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (error) {
+            Alert.alert("Error", error);
         }
+    }, [error]);
+
+    const handleAccept = (inviteId: string) => {
+        dispatch(acceptInviteRequest(inviteId));
     };
 
-    const handleAccept = async (inviteId: string) => {
-        setLoading(true);
-        try {
-            const token = await AsyncStorage.getItem('userToken');
-            const response = await fetch(`${API_BASE_URL}/pools/invites/${inviteId}/accept`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                Alert.alert("Success", "Invite accepted! You are now a member of the team.");
-                fetchInvites();
-            } else {
-                Alert.alert("Error", data.message || "Failed to accept invite");
-            }
-        } catch (error) {
-            console.error("Error accepting invite:", error);
-            Alert.alert("Error", "Something went wrong while accepting the invite");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleDecline = async (inviteId: string) => {
-        setLoading(true);
-        try {
-            const token = await AsyncStorage.getItem('userToken');
-            const response = await fetch(`${API_BASE_URL}/pools/invites/${inviteId}/decline`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                Alert.alert("Success", "Invite declined.");
-                fetchInvites();
-            } else {
-                Alert.alert("Error", data.message || "Failed to decline invite");
-            }
-        } catch (error) {
-            console.error("Error declining invite:", error);
-            Alert.alert("Error", "Something went wrong while declining the invite");
-        } finally {
-            setLoading(false);
-        }
+    const handleDecline = (inviteId: string) => {
+        dispatch(declineInviteRequest(inviteId));
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-background">
-            <StatusBar barStyle="light-content" />
+        <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
+            <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
             {/* Header */}
             <View className="flex-row items-center justify-between px-5 py-4">
@@ -200,6 +128,6 @@ export const InvitesScreen = () => {
             </View>
 
             <BottomNavBar />
-        </SafeAreaView>
+        </View>
     );
 };

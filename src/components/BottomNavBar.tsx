@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const BottomNavBar = () => {
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<any>();
     const route = useRoute();
     const currentRoute = route.name;
@@ -44,7 +46,10 @@ export const BottomNavBar = () => {
                 </View>
             )}
 
-            <View className="absolute bottom-0 left-0 right-0 bg-white flex-row justify-between px-8 py-4 pb-8 rounded-t-3xl shadow-lg border-t border-gray-100">
+            <View
+                className="absolute bottom-0 left-0 right-0 bg-white flex-row justify-between px-8 pt-4 rounded-t-3xl shadow-lg border-t border-gray-100"
+                style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+            >
                 <TouchableOpacity onPress={() => navigation.navigate('Home')} className="items-center">
                     <Ionicons
                         name={isActive('Home') ? "home" : "home-outline"}

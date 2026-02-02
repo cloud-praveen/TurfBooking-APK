@@ -5,68 +5,38 @@ import {
     TouchableOpacity,
     ScrollView,
     Image,
-    SafeAreaView,
+    ActivityIndicator,
+    Alert,
     StatusBar
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { BottomNavBar } from '../components/BottomNavBar';
-import { API_BASE_URL } from '../constants/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ActivityIndicator, Alert } from 'react-native';
-
-interface Pool {
-    id: string;
-    name: string;
-    sportType: string;
-    memberCount: number;
-    isOwner: boolean;
-    myRole: string;
-    managedByYou: boolean;
-    image?: string;
-}
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchMyTeamsRequest } from '../store/slices/teamSlice';
 
 export const TeamsScreen = () => {
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<any>();
+    const dispatch = useAppDispatch();
+
+    const { myTeams: teams, loading, error } = useAppSelector(state => state.teams);
     const [activeTab, setActiveTab] = useState<'active' | 'invites'>('active');
-    const [teams, setTeams] = useState<Pool[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchTeams();
-    }, []);
+        dispatch(fetchMyTeamsRequest());
+    }, [dispatch]);
 
-    const fetchTeams = async () => {
-        setLoading(true);
-        try {
-            const token = await AsyncStorage.getItem('userToken');
-            const response = await fetch(`${API_BASE_URL}/pools/mine`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
-            });
-
-            const data = await response.json();
-            console.log("Teams API Response:", data);
-
-            if (response.ok) {
-                setTeams(data.pools || []);
-            } else {
-                Alert.alert("Error", data.message || "Failed to fetch teams");
-            }
-        } catch (error) {
-            console.error("API Error fetching teams:", error);
-            // Alert.alert("Error", "Something went wrong while fetching teams");
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (error) {
+            Alert.alert("Error", error);
         }
-    };
+    }, [error]);
 
     return (
-        <SafeAreaView className="flex-1 bg-background">
-            <StatusBar barStyle="light-content" />
+        <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
+            <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
             {/* Header */}
             <View className="flex-row items-center justify-between px-5 py-4">
@@ -74,7 +44,7 @@ export const TeamsScreen = () => {
                     <Ionicons name="arrow-back" size={28} color="white" />
                 </TouchableOpacity>
                 <Text className="text-white text-xl font-bold">Teams</Text>
-                <View className="w-7" /> {/* Placeholder for balance */}
+                <View className="w-7" />
             </View>
 
             <View className="flex-1 px-5">
@@ -108,7 +78,9 @@ export const TeamsScreen = () => {
 
                 {/* List Section */}
                 <View className="mb-4">
-                    <Text className="text-white text-lg font-bold">Captain <Text className="text-primary text-xs font-normal">(Managed by you)</Text></Text>
+                    <Text className="text-white text-lg font-bold">
+                        Captain <Text className="text-primary text-xs font-normal">(Managed by you)</Text>
+                    </Text>
                 </View>
 
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -143,7 +115,7 @@ export const TeamsScreen = () => {
                                     </View>
                                 </View>
                                 <View className="ml-4">
-                                    <Ionicons name="chevron-forward" size={24} color="#22c55e" strokeWidth={4} />
+                                    <Ionicons name="chevron-forward" size={24} color="#22c55e" />
                                 </View>
                             </TouchableOpacity>
                         ))
@@ -156,6 +128,6 @@ export const TeamsScreen = () => {
             </View>
 
             <BottomNavBar />
-        </SafeAreaView>
+        </View>
     );
 };

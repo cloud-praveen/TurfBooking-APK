@@ -5,18 +5,19 @@ import {
     TouchableOpacity,
     ScrollView,
     TextInput,
-    SafeAreaView,
     StatusBar
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const CreateMatch = () => {
+    const insets = useSafeAreaInsets();
     const navigation = useNavigation<any>();
 
     return (
-        <SafeAreaView className="flex-1 bg-background">
-            <StatusBar barStyle="light-content" />
+        <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
+            <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
             {/* Header */}
             <View className="flex-row items-center justify-between px-5 py-4">
@@ -62,6 +63,6 @@ export const CreateMatch = () => {
                     <Text className="text-white text-lg font-bold">Create Match</Text>
                 </TouchableOpacity>
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
