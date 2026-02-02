@@ -31,10 +31,10 @@ interface MemberChipProps {
 }
 
 const MemberChip = ({ name, onRemove }: MemberChipProps) => (
-    <View className="bg-[#5a7a5a] flex-row items-center px-3 py-1 rounded-full mr-2 mb-2">
-        <Text className="text-white text-[10px] font-medium mr-1">{name}</Text>
+    <View className="bg-[#5a7a5a] flex-row items-center px-3 py-1.5 rounded-[10px] mr-2 mb-2">
+        <Text className="text-white text-base font-bold mr-1">{name}</Text>
         <TouchableOpacity onPress={onRemove}>
-            <Ionicons name="close-circle" size={14} color="white" />
+            <Ionicons name="close-circle" size={18} color="white" />
         </TouchableOpacity>
     </View>
 );

@@ -101,7 +101,7 @@ export const MatchSummary = () => {
                             <View className="flex-row flex-wrap">
                                 {matchData.teamA?.players?.map((player: any, index: number) => (
                                     <View key={index} className="bg-[#5a7a5a] px-4 py-1.5 rounded-[10px] mr-2 mb-2">
-                                        <Text className="text-white text-base font-medium">{player.name}</Text>
+                                        <Text className="text-white text-base font-bold">{player.name}</Text>
                                     </View>
                                 ))}
                             </View>
@@ -127,7 +127,7 @@ export const MatchSummary = () => {
                             <View className="flex-row flex-wrap">
                                 {matchData.teamB?.players?.map((player: any, index: number) => (
                                     <View key={index} className="bg-[#5a7a5a] px-4 py-1.5 rounded-[10px] mr-2 mb-2">
-                                        <Text className="text-white text-base font-medium">{player.name}</Text>
+                                        <Text className="text-white text-base font-bold">{player.name}</Text>
                                     </View>
                                 ))}
                             </View>
