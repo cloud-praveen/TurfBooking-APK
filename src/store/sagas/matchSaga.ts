@@ -65,6 +65,8 @@ function* handleRecordBall(action: any): any {
         const data = yield response.json();
         if (response.ok) {
             yield put(recordBallSuccess(data.match));
+            // Refresh live score to get updated striker/non-striker/bowler assignments
+            yield put(fetchLiveScoreRequest(matchId));
         } else {
             yield put(recordBallFailure(data.message || 'Failed to record ball'));
         }
@@ -84,6 +86,8 @@ function* handleUndoBall(action: any): any {
         const data = yield response.json();
         if (response.ok) {
             yield put(undoBallSuccess(data.match));
+            // Refresh live score after undo
+            yield put(fetchLiveScoreRequest(action.payload.matchId));
         } else {
             yield put(undoBallFailure(data.message || 'Failed to undo ball'));
         }
@@ -124,6 +128,8 @@ function* handleSelectNextBatter(action: any): any {
         const data = yield response.json();
         if (response.ok) {
             yield put(selectNextBatterSuccess());
+            // Refresh live score to show the new batter
+            yield put(fetchLiveScoreRequest(action.payload.matchId));
         } else {
             yield put(selectNextBatterFailure(data.message || 'Failed to select next batter'));
         }
@@ -147,6 +153,8 @@ function* handleSelectBowler(action: any): any {
         const data = yield response.json();
         if (response.ok) {
             yield put(selectBowlerSuccess());
+            // Refresh live score to show the new bowler
+            yield put(fetchLiveScoreRequest(matchId));
         } else {
             yield put(selectBowlerFailure(data.message || 'Failed to select bowler'));
         }

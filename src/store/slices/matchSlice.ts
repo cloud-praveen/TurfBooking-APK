@@ -44,7 +44,7 @@ const matchSlice = createSlice({
         },
         recordBallSuccess: (state, action: PayloadAction<any>) => {
             state.loading = false;
-            state.liveScore = action.payload;
+            state.currentMatch = action.payload;
         },
         recordBallFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;
@@ -55,7 +55,7 @@ const matchSlice = createSlice({
         },
         undoBallSuccess: (state, action: PayloadAction<any>) => {
             state.loading = false;
-            state.liveScore = action.payload;
+            state.currentMatch = action.payload;
         },
         undoBallFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;

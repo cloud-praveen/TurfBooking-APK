@@ -91,52 +91,28 @@ export const SecondInningsSelectionScreen = () => {
     const getTeams = () => {
         if (!matchData) return { battingTeam: null, bowlingTeam: null };
 
-        // Method 1: Use explicit currentInnings data if available
-        if (matchData.currentInnings && typeof matchData.currentInnings === 'object') {
-            const { battingTeamId, bowlingTeamId } = matchData.currentInnings;
+        // 1. Identify Team A and Team B IDs
+        const teamAId = (matchData.teamA?._id || matchData.teamA?.id)?.toString();
+        const teamBId = (matchData.teamB?._id || matchData.teamB?.id)?.toString();
 
-            let battingTeam = null;
-            let bowlingTeam = null;
+        // 2. Identify who won the toss and what they chose
+        const tossWinnerId = (matchData.tossWinner?._id || matchData.tossWinner?.id || matchData.tossWinner)?.toString();
+        const tossDecision = (matchData.tossDecision || '').toUpperCase();
 
-            const tA = matchData.teamA;
-            const tB = matchData.teamB;
-            const tAId = tA._id || tA.id;
-            const tBId = tB._id || tB.id;
-
-            if (battingTeamId) {
-                const bTeamIdStr = battingTeamId.toString();
-                if (tAId?.toString() === bTeamIdStr) battingTeam = tA;
-                else if (tBId?.toString() === bTeamIdStr) battingTeam = tB;
-            }
-
-            if (bowlingTeamId) {
-                const bowTeamIdStr = bowlingTeamId.toString();
-                if (tAId?.toString() === bowTeamIdStr) bowlingTeam = tA;
-                else if (tBId?.toString() === bowTeamIdStr) bowlingTeam = tB;
-            }
-
-            if (battingTeam && bowlingTeam) {
-                return { battingTeam, bowlingTeam };
-            }
+        if (!teamAId || !teamBId || !tossWinnerId || !tossDecision) {
+            return { battingTeam: matchData.teamB, bowlingTeam: matchData.teamA };
         }
 
-        // Method 2: Fallback logic based on Toss
-        const tossWinnerId = matchData.tossWinner?._id || matchData.tossWinner?.id || matchData.tossWinner;
-        const teamAId = matchData.teamA?._id || matchData.teamA?.id;
-        const tossDecision = matchData.tossDecision || '';
-        const didTeamAWinToss = tossWinnerId && teamAId && (tossWinnerId.toString() === teamAId.toString());
+        const isTeamAWinner = tossWinnerId === teamAId;
 
-        let firstInningsBattingTeam;
-        if (didTeamAWinToss) {
-            firstInningsBattingTeam = tossDecision.toUpperCase() === 'BAT' ? matchData.teamA : matchData.teamB;
+        let teamABattedFirst = false;
+        if (isTeamAWinner) {
+            teamABattedFirst = tossDecision === 'BAT';
         } else {
-            firstInningsBattingTeam = tossDecision.toUpperCase() === 'BAT' ? matchData.teamB : matchData.teamA;
+            teamABattedFirst = tossDecision === 'BOWL';
         }
 
-        // For Second Innings, it's the reverse
-        const firstInningsBattingTeamId = firstInningsBattingTeam?._id || firstInningsBattingTeam?.id;
-        if (firstInningsBattingTeamId && teamAId && firstInningsBattingTeamId.toString() === teamAId.toString()) {
-            // Team A batted first, so Team B bats second
+        if (teamABattedFirst) {
             return { battingTeam: matchData.teamB, bowlingTeam: matchData.teamA };
         } else {
             return { battingTeam: matchData.teamA, bowlingTeam: matchData.teamB };

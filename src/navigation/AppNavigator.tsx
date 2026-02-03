@@ -26,6 +26,10 @@ import { AdminBookingsScreen } from '../screens/admin/AdminBookingsScreen';
 import { TossSelectionScreen } from '../screens/TossSelectionScreen';
 import { SecondInningsSelectionScreen } from '../screens/SecondInningsSelectionScreen';
 import { LiveScoreView } from '../screens/LiveScoreView';
+import { RoleSelectionScreen } from '../screens/RoleSelectionScreen';
+import { RegisterNameScreen } from '../screens/RegisterNameScreen';
+import { RegisterUsernameScreen } from '../screens/RegisterUsernameScreen';
+import { RegisterEmailScreen } from '../screens/RegisterEmailScreen';
 
 
 
@@ -48,12 +52,16 @@ export const AppNavigator = () => {
             }}
         >
             <Stack.Screen name="Splash" component={SplashScreen} />
+            <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen
                 name="OtpVerification"
                 component={OtpVerificationScreen}
                 initialParams={{ phoneNumber: '' }}
             />
+            <Stack.Screen name="RegisterName" component={RegisterNameScreen} />
+            <Stack.Screen name="RegisterUsername" component={RegisterUsernameScreen} />
+            <Stack.Screen name="RegisterEmail" component={RegisterEmailScreen} />
             <Stack.Screen name="UserDetails" component={UserDetailsScreen} />
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="TurfDetails" component={TurfDetails} />

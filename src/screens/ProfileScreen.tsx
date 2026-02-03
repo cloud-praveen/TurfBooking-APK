@@ -1,13 +1,26 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 import { BottomNavBar } from '../components/BottomNavBar';
 import { COLORS } from '../constants/colors';
 
 export const ProfileScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.multiRemove(['userToken', 'userData']);
+            navigation.replace('RoleSelection');
+        } catch (error) {
+            console.error('Logout Error:', error);
+            Alert.alert('Error', 'Failed to log out');
+        }
+    };
 
     const StatBox = ({ icon, value, label, type = 'Ionicons' }: { icon: any, value: string, label: string, type?: 'Ionicons' | 'MaterialCommunityIcons' }) => (
         <View className="bg-surface border border-gray-700 rounded-3xl p-4 items-center flex-1 mx-2 h-32 justify-center">
@@ -95,7 +108,10 @@ export const ProfileScreen = () => {
 
                 {/* Logout */}
                 <View className="px-5 mt-4">
-                    <TouchableOpacity className="border border-red-900/50 bg-red-900/10 py-4 rounded-3xl items-center">
+                    <TouchableOpacity
+                        onPress={handleLogout}
+                        className="border border-red-900/50 bg-red-900/10 py-4 rounded-3xl items-center"
+                    >
                         <Text className="text-red-400 font-bold">Log out</Text>
                     </TouchableOpacity>
                 </View>

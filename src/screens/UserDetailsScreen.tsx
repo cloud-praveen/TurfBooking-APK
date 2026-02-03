@@ -24,7 +24,7 @@ export const UserDetailsScreen = () => {
             const token = await AsyncStorage.getItem('userToken');
             if (!token) {
                 Alert.alert("Error", "Authentication token not found. Please login again.");
-                navigation.replace('Login');
+                navigation.replace('RoleSelection');
                 return;
             }
 
@@ -67,7 +67,12 @@ export const UserDetailsScreen = () => {
                 }
 
                 Alert.alert("Success", "Profile updated successfully!");
-                navigation.replace('Home');
+
+                if (data.user && data.user.role === 'ADMIN') {
+                    navigation.replace('AdminHome');
+                } else {
+                    navigation.replace('Home');
+                }
             } else {
                 Alert.alert("Error", data.message || "Failed to update profile");
             }
@@ -88,8 +93,7 @@ export const UserDetailsScreen = () => {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
                     {/* Header/Title Area */}
-                    <View className="pt-16 pb-6 items-center">
-                        <View className="w-32 h-6 bg-gray-700 rounded-full mb-6 opacity-30" />
+                    <View className="pt-20 pb-6 items-center">
                         <Text className="text-white font-semibold text-lg">Turf Booking</Text>
                     </View>
 

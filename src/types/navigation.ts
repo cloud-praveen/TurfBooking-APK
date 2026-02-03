@@ -1,8 +1,12 @@
 export type RootStackParamList = {
     Splash: undefined;
-    Login: undefined;
-    OtpVerification: { phoneNumber?: string };
-    UserDetails: undefined;
+    RoleSelection: undefined;
+    Login: { role: 'USER' | 'ADMIN' };
+    OtpVerification: { phoneNumber: string; role: 'USER' | 'ADMIN' };
+    RegisterName: { phoneNumber: string; role: 'USER' | 'ADMIN' };
+    RegisterUsername: { phoneNumber: string; role: 'USER' | 'ADMIN'; fullName: string; suggestedUsername?: string };
+    RegisterEmail: { phoneNumber: string; role: 'USER' | 'ADMIN'; fullName: string; username: string };
+    UserDetails: undefined; // To be deprecated or repurposed
     Home: undefined;
     TurfDetails: { turfId?: string };
     SlotSelection: { turfId?: string };

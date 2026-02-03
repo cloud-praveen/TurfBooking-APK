@@ -104,15 +104,24 @@ export default function ScoreboardUpdate() {
     useEffect(() => {
         if (!currentMatch) return;
 
-        // Determine which team is batting
-        let isTeamABatting = true;
-        const liveBattingId = matchData?.battingTeam?.id || matchData?.battingTeam?._id;
-        const teamAId = currentMatch.teamA?._id || currentMatch.teamA?.id;
-        const teamBId = currentMatch.teamB?._id || currentMatch.teamB?.id;
+        // Determine which team is batting by comparing IDs robustly
+        const liveBattingId = (matchData?.battingTeam?._id || matchData?.battingTeam?.id || matchData?.battingTeam ||
+            currentMatch?.battingTeam?._id || currentMatch?.battingTeam?.id || currentMatch?.battingTeam)?.toString();
 
-        if (liveBattingId) {
-            if (liveBattingId.toString() === teamAId?.toString()) isTeamABatting = true;
-            else if (liveBattingId.toString() === teamBId?.toString()) isTeamABatting = false;
+        const teamAId = (currentMatch?.teamA?._id || currentMatch?.teamA?.id || currentMatch?.teamA)?.toString();
+        const teamBId = (currentMatch?.teamB?._id || currentMatch?.teamB?.id || currentMatch?.teamB)?.toString();
+
+        let isTeamABatting = true; // Default
+
+        if (liveBattingId && teamAId && teamBId) {
+            if (liveBattingId === teamAId) {
+                isTeamABatting = true;
+            } else if (liveBattingId === teamBId) {
+                isTeamABatting = false;
+            }
+        } else if (currentMatch?.currentInnings?.battingTeamId) {
+            // Fallback to match innings info
+            isTeamABatting = currentMatch.currentInnings.battingTeamId.toString() === teamAId;
         }
 
         if (isTeamABatting) {
@@ -261,8 +270,15 @@ export default function ScoreboardUpdate() {
         crr: matchData?.score?.crr ?? matchData?.crr ?? '0.00',
         rrr: matchData?.score?.requiredRunRate ?? matchData?.requiredRunRate ?? '0.00'
     };
-    const battingTeamName = matchData?.battingTeam?.name || matchData?.teamAName;
-    const bowlingTeamName = matchData?.bowlingTeam?.name || matchData?.teamBName;
+    const battingTeamName = matchData?.battingTeam?.name ||
+        (matchData?.battingTeam?.toString() === (currentMatch?.teamA?._id || currentMatch?.teamA?.id || currentMatch?.teamA)?.toString()
+            ? currentMatch?.teamA?.name : currentMatch?.teamB?.name) ||
+        matchData?.teamAName || "Batting Team";
+
+    const bowlingTeamName = matchData?.bowlingTeam?.name ||
+        (matchData?.bowlingTeam?.toString() === (currentMatch?.teamA?._id || currentMatch?.teamA?.id || currentMatch?.teamA)?.toString()
+            ? currentMatch?.teamA?.name : currentMatch?.teamB?.name) ||
+        matchData?.teamBName || "Bowling Team";
 
     const striker = matchData?.striker;
     const nonStriker = matchData?.nonStriker;
